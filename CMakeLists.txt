@@ -24,9 +24,9 @@ if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "Runtime Library")
 endif()
 
-option(WITH_ASIO "Enable ASIO audio interface" ON)
+option(WITH_ASIO "Enable ASIO audio interface" OFF)
 
-option(WITH_MULTIBUS_OUTPUT "Enable multibus output" OFF)
+option(WITH_MULTIBUS_OUTPUT "Enable multibus output" ON)
 
 add_subdirectory(JUCE)
 add_subdirectory(clap-juce-extensions EXCLUDE_FROM_ALL)
@@ -44,7 +44,7 @@ endif()
 
 if(WITH_MULTIBUS_OUTPUT)
     set(TARGET "${PROJECT_NAME}-multibus")
-    set(PRODUCT_NAME "${PROJECT_NAME}-multibus")
+    set(PRODUCT_NAME "${PROJECT_NAME}-multibus-diatonico")
     set(PLUGIN_DESCRIPTION "${PRODUCT_NAME} multibus")
     set(PLUGIN_CODE "E6hf")
 else()
@@ -71,6 +71,7 @@ juce_add_plugin(${TARGET}
     ICON_BIG "${CMAKE_CURRENT_SOURCE_DIR}/Resources/icons/icon256.png"
     ICON_SMALL "${CMAKE_CURRENT_SOURCE_DIR}/Resources/icons/icon64.png"
 )
+target_link_libraries(${TARGET} PRIVATE winmm)
 
 clap_juce_extensions_plugin(TARGET ${TARGET}
     CLAP_ID "com.ArthurBenilov.Aeolus"

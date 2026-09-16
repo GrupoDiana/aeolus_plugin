@@ -70,6 +70,30 @@ void Stop::initFromVar(const var& v)
         _name = obj->getProperty("name");
         _type = getTypeFromString(obj->getProperty("type"));
 
+        if (obj->hasProperty("outputBus"))
+            _outputBus = obj->getProperty("outputBus");
+
+        if (obj->hasProperty("distribution"))
+        {
+            const auto distribution = obj->getProperty("distribution");
+
+            if (const auto* distributionObj = distribution.getDynamicObject())
+            {
+                const auto type = distributionObj->getProperty("type").toString();
+
+                if (type == "diatonic") {
+                    _distribution = Distribution::Diatonic;
+
+                    if (distributionObj->hasProperty("C"))
+                        _distributionBusC = distributionObj->getProperty("C");
+
+                    if (distributionObj->hasProperty("CSharp"))
+                        _distributionBusCSharp = distributionObj->getProperty("CSharp");
+                }
+                   
+            }
+        }
+
         if (obj->hasProperty("gain"))
             _gain = obj->getProperty("gain");
 
@@ -105,6 +129,24 @@ void Stop::initFromVar(const var& v)
             }
         }
     }
+}
+
+int Stop::getOutputBusForNote(int note) const noexcept
+{
+    if (_distribution == Distribution::Diatonic)
+    {
+        const int pitchClass = note % 12;
+
+        if (pitchClass == 0 || pitchClass == 2 || pitchClass == 4 ||
+            pitchClass == 6 || pitchClass == 8 || pitchClass == 10)
+        {
+            return _distributionBusC;
+        }
+
+        return _distributionBusCSharp;
+    }
+
+    return _outputBus;
 }
 
 void Stop::addZone(Rankwave* ptr)

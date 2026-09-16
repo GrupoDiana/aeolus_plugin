@@ -469,8 +469,16 @@ bool Division::process(AudioBuffer<float>& targetBuffer, AudioBuffer<float>& voi
         voice->process(outL, outR);
 
 #if AEOLUS_MULTIBUS_OUTPUT
-        // Mix voice to the corresponding output channel depending on the pan-position
-        int ch = jlimit(0, targetBuffer.getNumChannels() - 1, int(voice->getPanPosition() * targetBuffer.getNumChannels()));
+        // Send the voice to the output bus assigned to its stop
+        int ch = 0;
+
+        const int stopIndex = voice->stopIndex();
+
+        if (isPositiveAndBelow(stopIndex, _stops.size()))
+            ch = _stops[stopIndex].getOutputBusForNote(voice->getNote()) - 1;
+
+        ch = jlimit(0, targetBuffer.getNumChannels() - 1, ch);
+
         targetBuffer.addFrom(ch, 0, voiceBuffer, 0, 0, SUB_FRAME_LENGTH);
 #else
         targetBuffer.addFrom(0, 0, voiceBuffer, 0, 0, SUB_FRAME_LENGTH);

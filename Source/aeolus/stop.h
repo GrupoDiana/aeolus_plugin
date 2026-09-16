@@ -43,6 +43,12 @@ public:
         String
     };
 
+    // Output distribution type.
+    enum class Distribution {
+        None,
+        Diatonic
+    };
+
     // Zone - a grouping pipes for a range of keys.
     struct Zone {
         juce::Range<int> keyRange;
@@ -72,6 +78,13 @@ public:
     bool isEnabled() const noexcept { return _enabled; }
     void setEnabled(bool shouldBeEnabled) noexcept { _enabled = shouldBeEnabled; }
 
+    int getOutputBus() const noexcept { return _outputBus; }
+    void setOutputBus(int bus) noexcept { _outputBus = bus; }
+
+    Distribution getDistribution() const noexcept { return _distribution; }
+    void setDistribution(Distribution distribution) noexcept { _distribution = distribution; }
+    int getOutputBusForNote(int note) const noexcept;
+
     const std::vector<Zone>& getZones() const noexcept { return _zones; }
 
     /**
@@ -100,6 +113,10 @@ private:
     float _gain{1.0f};
     float _chiffGain{0.0f};
     bool _enabled{false};
+    int _outputBus{ 0 };
+    Distribution _distribution{ Distribution::None };
+    int _distributionBusC{ 0 };
+    int _distributionBusCSharp{ 0 };
 };
 
 AEOLUS_NAMESPACE_END
